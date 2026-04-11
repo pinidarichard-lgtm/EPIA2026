@@ -4,7 +4,7 @@ export const EVALUATIONS_OPTIONS = [
   { id: 'epreuve1a', label: 'Épreuve 1a – Questions à choix multiple (QCM)' },
   { id: 'epreuve2_bref', label: 'Épreuve 2 – Questions à réponse brève' },
   { id: 'epreuve2_dev', label: 'Épreuve 2 – Questions à développement' },
-  { id: 'epreuve2_donnees', label: 'Épreuve 2 – Questions s\'appuyant sur des données' },
+  { id: 'epreuve2_donnees', label: "Épreuve 2 – Questions s'appuyant sur des données" },
   { id: 'epreuve1b', label: 'Épreuve 1b – Questions de sciences expérimentales' },
   { id: 'tp', label: 'Travaux pratiques (TP)' },
   { id: 'memoire', label: 'Mémoire (Extended Essay)' },
@@ -24,7 +24,7 @@ export const APPROCHES_OPTIONS = [
 ]
 
 export const DIFFERENTIATION_OPTIONS = [
-  { id: 'identite', label: 'Affirmation de l\'identité et construction de l\'estime de soi' },
+  { id: 'identite', label: "Affirmation de l'identité et construction de l'estime de soi" },
   { id: 'connaissances_ant', label: 'Valorisation des connaissances antérieures' },
   { id: 'etayage', label: 'Étayage' },
   { id: 'elargissement', label: 'Élargissement du champ de connaissances' },
@@ -36,7 +36,7 @@ export const ADA_OPTIONS = [
   { id: 'pensee', label: 'Compétences de pensée (pensée critique, créative)' },
   { id: 'sociales', label: 'Compétences sociales (collaboration, respect)' },
   { id: 'communication', label: 'Compétences de communication (écoute, expression écrite et orale)' },
-  { id: 'autogestion', label: 'Compétences d\'autogestion (organisation, gestion du temps)' },
+  { id: 'autogestion', label: "Compétences d'autogestion (organisation, gestion du temps)" },
   { id: 'recherche', label: 'Compétences de recherche (gestion de l\'information, médias)' },
 ]
 
@@ -67,30 +67,24 @@ export const INITIAL_FORM_STATE = {
   annee_scolaire: '',
   dates: '',
   groupe_matieres: '',
-  niveau: '',
+  niveau: '',        // "NM", "NS", ou "NM/NS"
   annee_pd: '',
   semestre: '',
+  trimestre: '',
 
-  // Phase 1 — Recherche
+  // Phase 1
   partie_cours: '',
   description_unite: '',
   evaluations: [],
-  evaluations_autre: '',
-
-  // Objectifs de transfert
   objectif_1: '',
   objectif_2: '',
   objectif_3: '',
-
-  // Compréhensions essentielles
   connaissance_4: '',
   connaissance_5: '',
   competence_6: '',
   competence_7: '',
   concept_8: '',
   concept_9: '',
-
-  // Questions de recherche
   question_factuelle_10: '',
   question_factuelle_11: '',
   question_conceptuelle_12: '',
@@ -98,9 +92,8 @@ export const INITIAL_FORM_STATE = {
   question_ouverte_14: '',
   question_ouverte_15: '',
 
-  // Phase 2 — Action
+  // Phase 2
   approches_pedagogiques: [],
-  approches_autre: '',
   evaluation_formative_18: '',
   evaluation_formative_19: '',
   evaluation_sommative_20: '',
@@ -118,7 +111,7 @@ export const INITIAL_FORM_STATE = {
   ressource_22: '',
   ressource_23: '',
 
-  // Phase 3 — Réflexion
+  // Phase 3
   ce_qui_a_bien_fonctionne: '',
   ce_qui_na_pas_bien_fonctionne: '',
   remarques_suggestions: '',
