@@ -12,29 +12,27 @@ export default function Layout({ children }) {
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'space-between',
-        height: '60px',
+        height: '64px',
         position: 'sticky',
         top: 0,
         zIndex: 100,
-        boxShadow: '0 2px 8px rgba(0,0,0,0.15)'
+        boxShadow: '0 2px 8px rgba(0,0,0,0.2)'
       }}>
-        <Link to="/" style={{ textDecoration: 'none', display: 'flex', alignItems: 'center', gap: '12px' }}>
-          <div style={{
-            width: 36, height: 36, borderRadius: 8,
-            background: '#e8b84b',
-            display: 'flex', alignItems: 'center', justifyContent: 'center',
-            fontWeight: 700, fontSize: 14, color: '#1a3a5c'
-          }}>IB</div>
+        <Link to="/" style={{ textDecoration: 'none', display: 'flex', alignItems: 'center', gap: '10px' }}>
+          <img
+            src="/logo-epia.png"
+            alt="Logo EPIA"
+            style={{ width: 44, height: 44, objectFit: 'contain', borderRadius: 6 }}
+          />
           <div>
-            <div style={{ fontWeight: 600, fontSize: 15, color: '#fff' }}>EPIA Lomé</div>
-            <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.65)', marginTop: -2 }}>Programme du Diplôme</div>
+            <div style={{ fontWeight: 700, fontSize: 15, color: '#fff' }}>EPIA Lomé</div>
+            <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.6)', marginTop: -2 }}>Programme du Diplôme</div>
           </div>
         </Link>
 
-        <nav style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
-          <NavLink to="/plans" active={location.pathname === '/plans'}>
-            Tous les plans
-          </NavLink>
+        <nav style={{ display: 'flex', gap: '6px', alignItems: 'center' }}>
+          <NavLink to="/apropos" active={location.pathname === '/apropos'}>À propos</NavLink>
+          <NavLink to="/plans" active={location.pathname === '/plans'}>Tous les plans</NavLink>
           <Link to="/plans/new" style={{
             background: '#e8b84b',
             color: '#1a3a5c',
@@ -42,14 +40,12 @@ export default function Layout({ children }) {
             padding: '7px 16px',
             borderRadius: 6,
             fontSize: 14,
-            fontWeight: 600,
-          }}>
-            + Nouveau plan
-          </Link>
+            fontWeight: 700,
+          }}>+ Nouveau plan</Link>
         </nav>
       </header>
 
-      <main style={{ flex: 1, padding: '2rem', maxWidth: 960, margin: '0 auto', width: '100%' }}>
+      <main style={{ flex: 1, padding: '2rem', maxWidth: 980, margin: '0 auto', width: '100%' }}>
         {children}
       </main>
 
