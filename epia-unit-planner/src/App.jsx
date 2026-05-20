@@ -6,6 +6,9 @@ import EditPlanPage from './pages/EditPlanPage'
 import ViewPlanPage from './pages/ViewPlanPage'
 import PlansListPage from './pages/PlansListPage'
 import AProposPage from './pages/AProposPage'
+import ElevesPage from './pages/ElevesPage'
+import AppelPage from './pages/AppelPage'
+import CahierPage from './pages/CahierPage'
 
 export default function App() {
   return (
@@ -17,6 +20,9 @@ export default function App() {
         <Route path="/plans/new" element={<NewPlanPage />} />
         <Route path="/plans/:id" element={<ViewPlanPage />} />
         <Route path="/plans/:id/edit" element={<EditPlanPage />} />
+        <Route path="/eleves" element={<ElevesPage />} />
+        <Route path="/appel" element={<AppelPage />} />
+        <Route path="/cahier" element={<CahierPage />} />
       </Routes>
     </Layout>
   )
