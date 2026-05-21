@@ -9,6 +9,9 @@ import AProposPage from './pages/AProposPage'
 import ElevesPage from './pages/ElevesPage'
 import AppelPage from './pages/AppelPage'
 import CahierPage from './pages/CahierPage'
+import NotesPage from './pages/NotesPage'
+import SuiviElevePage from './pages/SuiviElevePage'
+import AbsencesPage from './pages/AbsencesPage'
 
 export default function App() {
   return (
@@ -23,6 +26,9 @@ export default function App() {
         <Route path="/eleves" element={<ElevesPage />} />
         <Route path="/appel" element={<AppelPage />} />
         <Route path="/cahier" element={<CahierPage />} />
+        <Route path="/notes" element={<NotesPage />} />
+        <Route path="/suivi" element={<SuiviElevePage />} />
+        <Route path="/absences" element={<AbsencesPage />} />
       </Routes>
     </Layout>
   )
