@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { createClient } from "@supabase/supabase-js";
 
 const supabaseAdmin = createClient(
@@ -21,16 +22,14 @@ function Initials({ nom, prenom }) {
 }
 
 function Badge({ annee }) {
-  const cfg = {
-    D2:      { bg:"#EAF3DE", color:"#27500A", label:"D2 · 2025–2026" },
-    diplome: { bg:"#EEEDFE", color:"#3C3489", label:"Diplômé" },
-  }[annee] || { bg:"#E6F1FB", color:"#0C447C", label:"D1 · 2024–2025" };
+  const cfg = { D2:{ bg:"#EAF3DE",color:"#27500A",label:"D2 · 2025–2026" }, diplome:{ bg:"#EEEDFE",color:"#3C3489",label:"Diplômé" } }[annee] || { bg:"#E6F1FB",color:"#0C447C",label:"D1 · 2024–2025" };
   return <span style={{ fontSize:11,padding:"3px 10px",borderRadius:20,fontWeight:500,whiteSpace:"nowrap",background:cfg.bg,color:cfg.color }}>{cfg.label}</span>;
 }
 
 const s = {
   wrap:    { fontFamily:"sans-serif",padding:"1.5rem",maxWidth:860,margin:"0 auto" },
-  title:   { fontSize:22,fontWeight:600,margin:"0 0 1.5rem",color:"#111" },
+  header:  { display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:"1.5rem",flexWrap:"wrap",gap:10 },
+  title:   { fontSize:22,fontWeight:600,margin:0,color:"#111" },
   tabs:    { display:"flex",gap:8,marginBottom:"1.5rem",flexWrap:"wrap" },
   tab:     (a) => ({ padding:"8px 16px",border:"1px solid",borderRadius:8,cursor:"pointer",fontSize:13,fontWeight:a?500:400,background:a?"#1B3A6B":"transparent",color:a?"#fff":"#555",borderColor:a?"#1B3A6B":"#ddd" }),
   banner:  (t) => ({ padding:"10px 14px",borderRadius:8,fontSize:13,marginBottom:"1.25rem",background:t==="success"?"#EAF3DE":"#FCEBEB",color:t==="success"?"#27500A":"#A32D2D",border:`1px solid ${t==="success"?"#C0DD97":"#F7C1C1"}` }),
@@ -43,6 +42,7 @@ const s = {
   btnP:    { padding:"8px 16px",fontSize:13,border:"1px solid #1B3A6B",borderRadius:8,background:"#1B3A6B",color:"#fff",cursor:"pointer",fontWeight:500 },
   btnG:    { padding:"8px 16px",fontSize:13,border:"1px solid #C0DD97",borderRadius:8,background:"#EAF3DE",color:"#27500A",cursor:"pointer",fontWeight:500 },
   btnR:    { padding:"5px 10px",fontSize:12,border:"1px solid #F7C1C1",borderRadius:7,background:"#FCEBEB",color:"#A32D2D",cursor:"pointer",whiteSpace:"nowrap" },
+  btnIB:   { padding:"8px 16px",fontSize:13,border:"1px solid #B5D4F4",borderRadius:8,background:"#E6F1FB",color:"#185FA5",cursor:"pointer",fontWeight:500 },
   promo:   { background:"#f9f9f9",border:"1px solid #eee",borderRadius:12,padding:"1.25rem",marginBottom:"1.5rem" },
   sRow:    { display:"flex",gap:8,marginBottom:"1rem",flexWrap:"wrap" },
   count:   { fontSize:12,color:"#888",marginBottom:"0.75rem" },
@@ -56,11 +56,10 @@ const s = {
   mAct:    { display:"flex",gap:8,justifyContent:"flex-end",marginTop:"1.25rem" },
   grid2:   { display:"grid",gridTemplateColumns:"1fr 1fr",gap:12 },
   pwBox:   { fontFamily:"monospace",fontSize:13,background:"#f9f9f9",padding:"8px 12px",borderRadius:8,border:"1px solid #eee",display:"flex",alignItems:"center",gap:8,marginTop:8 },
-  section: { background:"#fff",border:"1px solid #eee",borderRadius:12,padding:"1.25rem",marginBottom:"1rem" },
-  sHead:   { fontSize:15,fontWeight:600,margin:"0 0 1rem",color:"#111" },
 };
 
 export default function AdminPage() {
+  const navigate = useNavigate();
   const [tab, setTab]           = useState("eleves");
   const [eleves, setEleves]     = useState([]);
   const [profs, setProfs]       = useState([]);
@@ -70,15 +69,13 @@ export default function AdminPage() {
   const [filterA, setFilterA]   = useState("");
   const [searchP, setSearchP]   = useState("");
 
-  // Modals
   const [modalAddEleve, setModalAddEleve] = useState(false);
   const [modalAddProf,  setModalAddProf]  = useState(false);
   const [modalAnnee,    setModalAnnee]    = useState(null);
   const [modalPromo,    setModalPromo]    = useState(false);
   const [modalMdp,      setModalMdp]      = useState(null);
-  const [modalDelEleve, setModalDelEleve] = useState(null);
+  const [modalDel,      setModalDel]      = useState(null);
 
-  // Formulaire ajout élève
   const [fNom,    setFNom]    = useState("");
   const [fPrenom, setFPrenom] = useState("");
   const [fEmail,  setFEmail]  = useState("");
@@ -87,25 +84,21 @@ export default function AdminPage() {
   const [fPw,     setFPw]     = useState("");
   const [fAutoPw, setFAutoPw] = useState(true);
 
-  // Formulaire ajout prof
   const [pNom,    setPNom]    = useState("");
   const [pPrenom, setPPrenom] = useState("");
   const [pEmail,  setPEmail]  = useState("");
   const [pPw,     setPPw]     = useState("");
   const [pAutoPw, setPAutoPw] = useState(true);
 
-  // Modifier année
   const [editAnnee, setEditAnnee] = useState("D1");
   const [editSco,   setEditSco]   = useState("2024-2025");
 
-  // Mot de passe
   const [newPw,   setNewPw]   = useState("");
   const [autoGen, setAutoGen] = useState(false);
   const [genPw,   setGenPw]   = useState("");
   const [showPw,  setShowPw]  = useState(false);
   const [copied,  setCopied]  = useState(false);
-
-  const [saving, setSaving] = useState(false);
+  const [saving,  setSaving]  = useState(false);
 
   useEffect(() => { loadAll(); }, []);
 
@@ -122,127 +115,103 @@ export default function AdminPage() {
 
   function showBanner(msg, type) { setBanner({ msg, type }); setTimeout(() => setBanner(null), 5000); }
 
-  // ── Ajouter un élève ──
   async function addEleve() {
     if (!fNom || !fPrenom || !fEmail) { showBanner("Remplissez nom, prénom et email.", "error"); return; }
     const pw = fAutoPw ? generatePassword() : fPw;
     if (!pw || pw.length < 8) { showBanner("Mot de passe minimum 8 caractères.", "error"); return; }
     setSaving(true);
     try {
-      // 1. Créer compte Auth
-      const { data: authData, error: authErr } = await supabaseAdmin.auth.admin.createUser({
-        email: fEmail, password: pw, email_confirm: true
-      });
+      const { data: authData, error: authErr } = await supabaseAdmin.auth.admin.createUser({ email: fEmail, password: pw, email_confirm: true });
       if (authErr) throw authErr;
-
-      // 2. Insérer dans eleves
-      const { data: el, error: elErr } = await supabaseAdmin.from("eleves").insert({
-        nom: fNom, prenom: fPrenom, email: fEmail,
-        annee_pd: fAnnee, annee_scolaire: fSco,
-        auth_id: authData.user.id, actif: true
-      }).select().single();
+      const { data: el, error: elErr } = await supabaseAdmin.from("eleves").insert({ nom:fNom,prenom:fPrenom,email:fEmail,annee_pd:fAnnee,annee_scolaire:fSco,auth_id:authData.user.id,actif:true }).select().single();
       if (elErr) throw elErr;
-
       setEleves(prev => [...prev, el].sort((a,b) => a.nom.localeCompare(b.nom)));
       setModalAddEleve(false);
       resetEleveForm();
       showBanner(`✓ ${fPrenom} ${fNom} ajouté(e). Mot de passe : ${pw}`, "success");
-    } catch(e) {
-      showBanner("Erreur : " + e.message, "error");
-    }
+    } catch(e) { showBanner("Erreur : " + e.message, "error"); }
     setSaving(false);
   }
 
-  // ── Ajouter un prof ──
   async function addProf() {
     if (!pNom || !pPrenom || !pEmail) { showBanner("Remplissez nom, prénom et email.", "error"); return; }
     const pw = pAutoPw ? generatePassword() : pPw;
     if (!pw || pw.length < 8) { showBanner("Mot de passe minimum 8 caractères.", "error"); return; }
     setSaving(true);
     try {
-      const { data: authData, error: authErr } = await supabaseAdmin.auth.admin.createUser({
-        email: pEmail, password: pw, email_confirm: true
-      });
+      const { data: authData, error: authErr } = await supabaseAdmin.auth.admin.createUser({ email: pEmail, password: pw, email_confirm: true });
       if (authErr) throw authErr;
-
-      const { data: pr, error: prErr } = await supabaseAdmin.from("profs").insert({
-        nom: pNom, prenom: pPrenom, email: pEmail,
-        auth_id: authData.user.id, actif: true
-      }).select().single();
+      const { data: pr, error: prErr } = await supabaseAdmin.from("profs").insert({ nom:pNom,prenom:pPrenom,email:pEmail,auth_id:authData.user.id,actif:true }).select().single();
       if (prErr) throw prErr;
-
       setProfs(prev => [...prev, pr].sort((a,b) => a.nom.localeCompare(b.nom)));
       setModalAddProf(false);
       resetProfForm();
       showBanner(`✓ Prof ${pPrenom} ${pNom} ajouté(e). Mot de passe : ${pw}`, "success");
-    } catch(e) {
-      showBanner("Erreur : " + e.message, "error");
-    }
+    } catch(e) { showBanner("Erreur : " + e.message, "error"); }
     setSaving(false);
   }
 
-  // ── Modifier année ──
   async function saveAnnee() {
-    const { error } = await supabaseAdmin.from("eleves")
-      .update({ annee_pd: editAnnee, annee_scolaire: editSco })
-      .eq("id", modalAnnee.id);
+    const { error } = await supabaseAdmin.from("eleves").update({ annee_pd:editAnnee,annee_scolaire:editSco }).eq("id", modalAnnee.id);
     if (error) { showBanner("Erreur : " + error.message, "error"); return; }
-    setEleves(prev => prev.map(u => u.id === modalAnnee.id ? { ...u, annee_pd: editAnnee, annee_scolaire: editSco } : u));
+    setEleves(prev => prev.map(u => u.id===modalAnnee.id ? { ...u,annee_pd:editAnnee,annee_scolaire:editSco } : u));
     setModalAnnee(null);
     showBanner("✓ Année mise à jour.", "success");
   }
 
-  // ── Promouvoir D1 → D2 ──
   async function promouvoirPromo() {
-    const { error } = await supabaseAdmin.from("eleves").update({ annee_pd: "D2", annee_scolaire: "2025-2026" }).eq("annee_pd", "D1");
+    const { error } = await supabaseAdmin.from("eleves").update({ annee_pd:"D2",annee_scolaire:"2025-2026" }).eq("annee_pd","D1");
     if (error) { showBanner("Erreur : " + error.message, "error"); return; }
-    setEleves(prev => prev.map(u => u.annee_pd === "D1" ? { ...u, annee_pd: "D2", annee_scolaire: "2025-2026" } : u));
+    setEleves(prev => prev.map(u => u.annee_pd==="D1" ? { ...u,annee_pd:"D2",annee_scolaire:"2025-2026" } : u));
     setModalPromo(false);
     showBanner("✓ Tous les D1 promus en D2.", "success");
   }
 
-  // ── Changer mot de passe ──
   async function saveMdp() {
     const pw = autoGen ? genPw : newPw;
     if (!pw || pw.length < 8) { showBanner("Minimum 8 caractères.", "error"); return; }
-    if (!modalMdp.auth_id) { showBanner("Pas de compte Auth pour cet utilisateur.", "error"); return; }
+    if (!modalMdp.auth_id) { showBanner("Pas de compte Auth.", "error"); return; }
     const { error } = await supabaseAdmin.auth.admin.updateUserById(modalMdp.auth_id, { password: pw });
     if (error) { showBanner("Erreur : " + error.message, "error"); return; }
     setModalMdp(null);
     showBanner("✓ Mot de passe mis à jour.", "success");
   }
 
-  // ── Supprimer élève ──
-  async function deleteEleve() {
-    const u = modalDelEleve;
+  async function deleteUser() {
+    const u = modalDel;
     if (u.auth_id) await supabaseAdmin.auth.admin.deleteUser(u.auth_id);
-    await supabaseAdmin.from("eleves").delete().eq("id", u.id);
-    setEleves(prev => prev.filter(e => e.id !== u.id));
-    setModalDelEleve(null);
-    showBanner("✓ Élève supprimé.", "success");
+    if (u._type === "eleve") {
+      await supabaseAdmin.from("eleves").delete().eq("id", u.id);
+      setEleves(prev => prev.filter(e => e.id !== u.id));
+    } else {
+      await supabaseAdmin.from("profs").delete().eq("id", u.id);
+      setProfs(prev => prev.filter(p => p.id !== u.id));
+    }
+    setModalDel(null);
+    showBanner("✓ Utilisateur supprimé.", "success");
   }
 
   function resetEleveForm() { setFNom(""); setFPrenom(""); setFEmail(""); setFAnnee("D1"); setFSco("2024-2025"); setFPw(""); setFAutoPw(true); }
   function resetProfForm()  { setPNom(""); setPPrenom(""); setPEmail(""); setPPw(""); setPAutoPw(true); }
-
   function copyPw() { navigator.clipboard.writeText(genPw); setCopied(true); setTimeout(() => setCopied(false), 2000); }
 
   const filteredE = eleves.filter(u => {
     const q = searchE.toLowerCase();
     const match = `${u.nom} ${u.prenom} ${u.email||""}`.toLowerCase().includes(q);
-    return filterA ? match && u.annee_pd === filterA : match;
+    return filterA ? match && u.annee_pd===filterA : match;
   });
   const filteredP = profs.filter(u => `${u.nom} ${u.prenom} ${u.email||""}`.toLowerCase().includes(searchP.toLowerCase()));
-  const nbD1 = eleves.filter(u => u.annee_pd === "D1").length;
+  const nbD1 = eleves.filter(u => u.annee_pd==="D1").length;
 
   return (
     <div style={s.wrap}>
-      const navigate = useNavigate();
-import { useNavigate } from "react-router-dom";
-      <h1 style={s.title}>🛠️ Administration EPIA</h1>
-      <button style={s.btnSm} onClick={() => navigate("/admin/matieres-ib")}>
-  ⚙️ Configurer les matières IB
-</button>
+      <div style={s.header}>
+        <h1 style={s.title}>🛠️ Administration EPIA</h1>
+        <button style={s.btnIB} onClick={() => navigate("/admin/matieres-ib")}>
+          ⚙️ Configurer les matières IB
+        </button>
+      </div>
+
       {banner && <div style={s.banner(banner.type)}>{banner.msg}</div>}
 
       <div style={s.tabs}>
@@ -252,13 +221,13 @@ import { useNavigate } from "react-router-dom";
       </div>
 
       {/* ══ ONGLET ÉLÈVES ══ */}
-      {tab === "eleves" && <>
-        <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center", marginBottom:"1rem", flexWrap:"wrap", gap:8 }}>
-          <span style={{ fontSize:14, color:"#555" }}>{eleves.length} élève(s) enregistré(s)</span>
+      {tab==="eleves" && <>
+        <div style={{ display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:"1rem",flexWrap:"wrap",gap:8 }}>
+          <span style={{ fontSize:14,color:"#555" }}>{eleves.length} élève(s)</span>
           <button style={s.btnP} onClick={() => { resetEleveForm(); setModalAddEleve(true); }}>+ Ajouter un élève</button>
         </div>
         <div style={s.sRow}>
-          <input style={{ ...s.inp, flex:1, width:"auto" }} placeholder="Rechercher..." value={searchE} onChange={e => setSearchE(e.target.value)} />
+          <input style={{ ...s.inp,flex:1,width:"auto" }} placeholder="Rechercher..." value={searchE} onChange={e => setSearchE(e.target.value)} />
           <select style={s.sel} value={filterA} onChange={e => setFilterA(e.target.value)}>
             <option value="">Toutes les années</option>
             <option value="D1">D1</option>
@@ -273,55 +242,58 @@ import { useNavigate } from "react-router-dom";
               <Initials nom={u.nom} prenom={u.prenom} />
               <div style={s.info}>
                 <p style={s.name}>{u.prenom} {u.nom}</p>
-                <p style={s.email}>{u.email || "—"} · {u.annee_scolaire || "—"}</p>
+                <p style={s.email}>{u.email||"—"} · {u.annee_scolaire||"—"}</p>
               </div>
               <Badge annee={u.annee_pd} />
-              <div style={{ display:"flex", gap:6, flexWrap:"wrap" }}>
+              <div style={{ display:"flex",gap:6,flexWrap:"wrap" }}>
                 <button style={s.btnSm} onClick={() => { setModalAnnee(u); setEditAnnee(u.annee_pd||"D1"); setEditSco(u.annee_scolaire||"2024-2025"); }}>✏️ Année</button>
                 <button style={s.btnSm} onClick={() => { setModalMdp(u); setNewPw(""); setAutoGen(false); setGenPw(""); setShowPw(false); }}>🔒 Mdp</button>
-                <button style={s.btnR}  onClick={() => setModalDelEleve(u)}>🗑️</button>
+                <button style={s.btnR}  onClick={() => setModalDel({ ...u, _type:"eleve" })}>🗑️</button>
               </div>
             </div>
           </div>
         ))}
-        {!loading && filteredE.length === 0 && <p style={{ color:"#aaa", fontSize:13, textAlign:"center", marginTop:"2rem" }}>Aucun élève trouvé. Cliquez "+ Ajouter un élève" pour commencer.</p>}
+        {!loading && filteredE.length===0 && <p style={{ color:"#aaa",fontSize:13,textAlign:"center",marginTop:"2rem" }}>Aucun élève. Cliquez "+ Ajouter un élève".</p>}
       </>}
 
       {/* ══ ONGLET PROFS ══ */}
-      {tab === "profs" && <>
-        <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center", marginBottom:"1rem", flexWrap:"wrap", gap:8 }}>
-          <span style={{ fontSize:14, color:"#555" }}>{profs.length} professeur(s) enregistré(s)</span>
+      {tab==="profs" && <>
+        <div style={{ display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:"1rem",flexWrap:"wrap",gap:8 }}>
+          <span style={{ fontSize:14,color:"#555" }}>{profs.length} professeur(s)</span>
           <button style={s.btnP} onClick={() => { resetProfForm(); setModalAddProf(true); }}>+ Ajouter un prof</button>
         </div>
-        <input style={{ ...s.inp, marginBottom:"1rem" }} placeholder="Rechercher..." value={searchP} onChange={e => setSearchP(e.target.value)} />
+        <input style={{ ...s.inp,marginBottom:"1rem" }} placeholder="Rechercher..." value={searchP} onChange={e => setSearchP(e.target.value)} />
         <p style={s.count}>{loading ? "Chargement..." : `${filteredP.length} professeur(s)`}</p>
         {filteredP.map(u => (
           <div key={u.id} style={s.card}>
             <div style={s.row}>
-              <div style={{ ...s.info.valueOf(), width:38,height:38,borderRadius:"50%",background:"#EEEDFE",color:"#3C3489",display:"flex",alignItems:"center",justifyContent:"center",fontSize:13,fontWeight:500,flexShrink:0 }}>
+              <div style={{ width:38,height:38,borderRadius:"50%",background:"#EEEDFE",color:"#3C3489",display:"flex",alignItems:"center",justifyContent:"center",fontSize:13,fontWeight:500,flexShrink:0 }}>
                 {(u.prenom||"?")[0].toUpperCase()}{(u.nom||"?")[0].toUpperCase()}
               </div>
               <div style={s.info}>
                 <p style={s.name}>{u.prenom} {u.nom}</p>
-                <p style={s.email}>{u.email || "—"}</p>
+                <p style={s.email}>{u.email||"—"}</p>
               </div>
               <span style={{ fontSize:11,padding:"3px 10px",borderRadius:20,fontWeight:500,background:"#EEEDFE",color:"#3C3489" }}>Professeur</span>
-              <button style={s.btnSm} onClick={() => { setModalMdp(u); setNewPw(""); setAutoGen(false); setGenPw(""); setShowPw(false); }}>🔒 Mdp</button>
+              <div style={{ display:"flex",gap:6 }}>
+                <button style={s.btnSm} onClick={() => { setModalMdp(u); setNewPw(""); setAutoGen(false); setGenPw(""); setShowPw(false); }}>🔒 Mdp</button>
+                <button style={s.btnR}  onClick={() => setModalDel({ ...u, _type:"prof" })}>🗑️</button>
+              </div>
             </div>
           </div>
         ))}
-        {!loading && filteredP.length === 0 && <p style={{ color:"#aaa", fontSize:13, textAlign:"center", marginTop:"2rem" }}>Aucun professeur. Cliquez "+ Ajouter un prof".</p>}
+        {!loading && filteredP.length===0 && <p style={{ color:"#aaa",fontSize:13,textAlign:"center",marginTop:"2rem" }}>Aucun professeur.</p>}
       </>}
 
       {/* ══ ONGLET ANNÉES ══ */}
-      {tab === "annees" && <>
+      {tab==="annees" && <>
         <div style={s.promo}>
-          <p style={{ fontWeight:600, margin:"0 0 4px", color:"#111" }}>Promotion collective D1 → D2</p>
-          <p style={{ fontSize:13, color:"#666", margin:"0 0 1rem" }}>{nbD1} élève(s) actuellement en D1 passeront en D2 (2025–2026).</p>
+          <p style={{ fontWeight:600,margin:"0 0 4px",color:"#111" }}>Promotion collective D1 → D2</p>
+          <p style={{ fontSize:13,color:"#666",margin:"0 0 1rem" }}>{nbD1} élève(s) en D1 → D2 (2025–2026).</p>
           <button style={s.btnSm} onClick={() => setModalPromo(true)}>👥 Promouvoir tous les D1 → D2</button>
         </div>
         <div style={s.sRow}>
-          <input style={{ ...s.inp, flex:1, width:"auto" }} placeholder="Rechercher..." value={searchE} onChange={e => setSearchE(e.target.value)} />
+          <input style={{ ...s.inp,flex:1,width:"auto" }} placeholder="Rechercher..." value={searchE} onChange={e => setSearchE(e.target.value)} />
           <select style={s.sel} value={filterA} onChange={e => setFilterA(e.target.value)}>
             <option value="">Toutes les années</option>
             <option value="D1">D1</option>
@@ -336,7 +308,7 @@ import { useNavigate } from "react-router-dom";
               <Initials nom={u.nom} prenom={u.prenom} />
               <div style={s.info}>
                 <p style={s.name}>{u.prenom} {u.nom}</p>
-                <p style={s.email}>{u.annee_scolaire || "—"}</p>
+                <p style={s.email}>{u.annee_scolaire||"—"}</p>
               </div>
               <Badge annee={u.annee_pd} />
               <button style={s.btnSm} onClick={() => { setModalAnnee(u); setEditAnnee(u.annee_pd||"D1"); setEditSco(u.annee_scolaire||"2024-2025"); }}>✏️ Modifier</button>
@@ -351,34 +323,21 @@ import { useNavigate } from "react-router-dom";
           <div style={s.mBox}>
             <h3 style={s.mTitle}>👨‍🎓 Ajouter un élève</h3>
             <div style={s.grid2}>
-              <div style={s.field}>
-                <label style={s.lbl}>Prénom *</label>
-                <input style={s.inp} placeholder="Kofi" value={fPrenom} onChange={e => setFPrenom(e.target.value)} />
-              </div>
-              <div style={s.field}>
-                <label style={s.lbl}>Nom *</label>
-                <input style={s.inp} placeholder="Ayivi" value={fNom} onChange={e => setFNom(e.target.value)} />
-              </div>
+              <div style={s.field}><label style={s.lbl}>Prénom *</label><input style={s.inp} placeholder="Kofi" value={fPrenom} onChange={e => setFPrenom(e.target.value)} /></div>
+              <div style={s.field}><label style={s.lbl}>Nom *</label><input style={s.inp} placeholder="Ayivi" value={fNom} onChange={e => setFNom(e.target.value)} /></div>
             </div>
-            <div style={s.field}>
-              <label style={s.lbl}>Email *</label>
-              <input style={s.inp} type="email" placeholder="kofi.ayivi@epia.tg" value={fEmail} onChange={e => setFEmail(e.target.value)} />
-            </div>
+            <div style={s.field}><label style={s.lbl}>Email *</label><input style={s.inp} type="email" placeholder="kofi.ayivi@epia.tg" value={fEmail} onChange={e => setFEmail(e.target.value)} /></div>
             <div style={s.grid2}>
               <div style={s.field}>
                 <label style={s.lbl}>Année PD</label>
                 <select style={s.sel} value={fAnnee} onChange={e => setFAnnee(e.target.value)}>
-                  <option value="D1">D1</option>
-                  <option value="D2">D2</option>
-                  <option value="diplome">Diplômé</option>
+                  <option value="D1">D1</option><option value="D2">D2</option><option value="diplome">Diplômé</option>
                 </select>
               </div>
               <div style={s.field}>
                 <label style={s.lbl}>Année scolaire</label>
                 <select style={s.sel} value={fSco} onChange={e => setFSco(e.target.value)}>
-                  <option value="2024-2025">2024–2025</option>
-                  <option value="2025-2026">2025–2026</option>
-                  <option value="2026-2027">2026–2027</option>
+                  <option value="2024-2025">2024–2025</option><option value="2025-2026">2025–2026</option><option value="2026-2027">2026–2027</option>
                 </select>
               </div>
             </div>
@@ -389,16 +348,13 @@ import { useNavigate } from "react-router-dom";
                 Générer automatiquement
               </label>
               {fAutoPw
-                ? <div style={s.pwBox}>
-                    <span style={{ flex:1 }}>{fPw || "—"}</span>
-                    <button style={{ ...s.btnSm,fontSize:11 }} onClick={() => setFPw(generatePassword())}>🔄 Nouveau</button>
-                  </div>
-                : <input style={s.inp} type="text" placeholder="Minimum 8 caractères" value={fPw} onChange={e => setFPw(e.target.value)} />
+                ? <div style={s.pwBox}><span style={{ flex:1 }}>{fPw||"—"}</span><button style={{ ...s.btnSm,fontSize:11 }} onClick={() => setFPw(generatePassword())}>🔄</button></div>
+                : <input style={s.inp} type="text" placeholder="Min. 8 caractères" value={fPw} onChange={e => setFPw(e.target.value)} />
               }
             </div>
             <div style={s.mAct}>
               <button style={s.btnSm} onClick={() => setModalAddEleve(false)}>Annuler</button>
-              <button style={s.btnP} onClick={addEleve} disabled={saving}>{saving ? "Création..." : "✓ Créer l'élève"}</button>
+              <button style={s.btnP} onClick={addEleve} disabled={saving}>{saving?"Création...":"✓ Créer l'élève"}</button>
             </div>
           </div>
         </div>
@@ -410,19 +366,10 @@ import { useNavigate } from "react-router-dom";
           <div style={s.mBox}>
             <h3 style={s.mTitle}>👩‍🏫 Ajouter un professeur</h3>
             <div style={s.grid2}>
-              <div style={s.field}>
-                <label style={s.lbl}>Prénom *</label>
-                <input style={s.inp} placeholder="Marie" value={pPrenom} onChange={e => setPPrenom(e.target.value)} />
-              </div>
-              <div style={s.field}>
-                <label style={s.lbl}>Nom *</label>
-                <input style={s.inp} placeholder="Dupont" value={pNom} onChange={e => setPNom(e.target.value)} />
-              </div>
+              <div style={s.field}><label style={s.lbl}>Prénom *</label><input style={s.inp} placeholder="Marie" value={pPrenom} onChange={e => setPPrenom(e.target.value)} /></div>
+              <div style={s.field}><label style={s.lbl}>Nom *</label><input style={s.inp} placeholder="Dupont" value={pNom} onChange={e => setPNom(e.target.value)} /></div>
             </div>
-            <div style={s.field}>
-              <label style={s.lbl}>Email *</label>
-              <input style={s.inp} type="email" placeholder="marie.dupont@epia.tg" value={pEmail} onChange={e => setPEmail(e.target.value)} />
-            </div>
+            <div style={s.field}><label style={s.lbl}>Email *</label><input style={s.inp} type="email" placeholder="marie.dupont@epia.tg" value={pEmail} onChange={e => setPEmail(e.target.value)} /></div>
             <div style={s.field}>
               <label style={s.lbl}>Mot de passe</label>
               <label style={{ fontSize:13,color:"#555",display:"flex",alignItems:"center",gap:6,cursor:"pointer",marginBottom:6 }}>
@@ -430,16 +377,13 @@ import { useNavigate } from "react-router-dom";
                 Générer automatiquement
               </label>
               {pAutoPw
-                ? <div style={s.pwBox}>
-                    <span style={{ flex:1 }}>{pPw || "—"}</span>
-                    <button style={{ ...s.btnSm,fontSize:11 }} onClick={() => setPPw(generatePassword())}>🔄 Nouveau</button>
-                  </div>
-                : <input style={s.inp} type="text" placeholder="Minimum 8 caractères" value={pPw} onChange={e => setPPw(e.target.value)} />
+                ? <div style={s.pwBox}><span style={{ flex:1 }}>{pPw||"—"}</span><button style={{ ...s.btnSm,fontSize:11 }} onClick={() => setPPw(generatePassword())}>🔄</button></div>
+                : <input style={s.inp} type="text" placeholder="Min. 8 caractères" value={pPw} onChange={e => setPPw(e.target.value)} />
               }
             </div>
             <div style={s.mAct}>
               <button style={s.btnSm} onClick={() => setModalAddProf(false)}>Annuler</button>
-              <button style={s.btnP} onClick={addProf} disabled={saving}>{saving ? "Création..." : "✓ Créer le prof"}</button>
+              <button style={s.btnP} onClick={addProf} disabled={saving}>{saving?"Création...":"✓ Créer le prof"}</button>
             </div>
           </div>
         </div>
@@ -455,17 +399,13 @@ import { useNavigate } from "react-router-dom";
               <div style={s.field}>
                 <label style={s.lbl}>Année PD</label>
                 <select style={s.sel} value={editAnnee} onChange={e => setEditAnnee(e.target.value)}>
-                  <option value="D1">D1</option>
-                  <option value="D2">D2</option>
-                  <option value="diplome">Diplômé</option>
+                  <option value="D1">D1</option><option value="D2">D2</option><option value="diplome">Diplômé</option>
                 </select>
               </div>
               <div style={s.field}>
                 <label style={s.lbl}>Année scolaire</label>
                 <select style={s.sel} value={editSco} onChange={e => setEditSco(e.target.value)}>
-                  <option value="2024-2025">2024–2025</option>
-                  <option value="2025-2026">2025–2026</option>
-                  <option value="2026-2027">2026–2027</option>
+                  <option value="2024-2025">2024–2025</option><option value="2025-2026">2025–2026</option><option value="2026-2027">2026–2027</option>
                 </select>
               </div>
             </div>
@@ -482,7 +422,7 @@ import { useNavigate } from "react-router-dom";
         <div style={s.modal} onClick={e => e.target===e.currentTarget && setModalPromo(false)}>
           <div style={s.mBox}>
             <h3 style={s.mTitle}>👥 Promotion D1 → D2</h3>
-            <p style={{ fontSize:13,color:"#666",margin:"0 0 1rem" }}><strong>{nbD1} élève(s) D1</strong> passeront en D2 (2025–2026). Irréversible.</p>
+            <p style={{ fontSize:13,color:"#666",margin:"0 0 1rem" }}><strong>{nbD1} élève(s) D1</strong> passeront en D2. Irréversible.</p>
             <div style={s.mAct}>
               <button style={s.btnSm} onClick={() => setModalPromo(false)}>Annuler</button>
               <button style={s.btnG} onClick={promouvoirPromo}>✓ Confirmer</button>
@@ -501,7 +441,7 @@ import { useNavigate } from "react-router-dom";
             <div style={s.field}>
               <label style={s.lbl}>Nouveau mot de passe</label>
               <div style={{ position:"relative" }}>
-                <input style={{ ...s.inp,paddingRight:38 }} type={showPw?"text":"password"} placeholder="Minimum 8 caractères" value={newPw} disabled={autoGen} onChange={e => setNewPw(e.target.value)} />
+                <input style={{ ...s.inp,paddingRight:38 }} type={showPw?"text":"password"} placeholder="Min. 8 caractères" value={newPw} disabled={autoGen} onChange={e => setNewPw(e.target.value)} />
                 <button onClick={() => setShowPw(!showPw)} style={{ position:"absolute",right:10,top:"50%",transform:"translateY(-50%)",background:"none",border:"none",cursor:"pointer",fontSize:16 }}>{showPw?"🙈":"👁️"}</button>
               </div>
             </div>
@@ -510,11 +450,7 @@ import { useNavigate } from "react-router-dom";
                 <input type="checkbox" checked={autoGen} onChange={e => { setAutoGen(e.target.checked); if(e.target.checked) setGenPw(generatePassword()); }} style={{ width:"auto" }} />
                 Générer automatiquement
               </label>
-              {autoGen && <div style={s.pwBox}>
-                <span style={{ flex:1 }}>{genPw}</span>
-                <button style={{ ...s.btnSm,fontSize:11 }} onClick={copyPw}>{copied?"✓ Copié":"📋 Copier"}</button>
-                <button style={{ ...s.btnSm,fontSize:11 }} onClick={() => setGenPw(generatePassword())}>🔄</button>
-              </div>}
+              {autoGen && <div style={s.pwBox}><span style={{ flex:1 }}>{genPw}</span><button style={{ ...s.btnSm,fontSize:11 }} onClick={copyPw}>{copied?"✓":"📋"}</button><button style={{ ...s.btnSm,fontSize:11 }} onClick={() => setGenPw(generatePassword())}>🔄</button></div>}
             </div>
             <div style={s.mAct}>
               <button style={s.btnSm} onClick={() => setModalMdp(null)}>Annuler</button>
@@ -524,18 +460,17 @@ import { useNavigate } from "react-router-dom";
         </div>
       )}
 
-      {/* ══ MODAL SUPPRIMER ÉLÈVE ══ */}
-      {modalDelEleve && (
-        <div style={s.modal} onClick={e => e.target===e.currentTarget && setModalDelEleve(null)}>
+      {/* ══ MODAL SUPPRIMER ══ */}
+      {modalDel && (
+        <div style={s.modal} onClick={e => e.target===e.currentTarget && setModalDel(null)}>
           <div style={s.mBox}>
-            <h3 style={s.mTitle}>🗑️ Supprimer l'élève</h3>
+            <h3 style={s.mTitle}>🗑️ Supprimer</h3>
             <p style={{ fontSize:13,color:"#666",margin:"0 0 1rem" }}>
-              Voulez-vous vraiment supprimer <strong>{modalDelEleve.prenom} {modalDelEleve.nom}</strong> ?<br/>
-              Son compte de connexion sera aussi supprimé. Irréversible.
+              Voulez-vous supprimer <strong>{modalDel.prenom} {modalDel.nom}</strong> ?<br/>Son compte sera aussi supprimé. Irréversible.
             </p>
             <div style={s.mAct}>
-              <button style={s.btnSm} onClick={() => setModalDelEleve(null)}>Annuler</button>
-              <button style={{ ...s.btnP,background:"#A32D2D",borderColor:"#A32D2D" }} onClick={deleteEleve}>Supprimer</button>
+              <button style={s.btnSm} onClick={() => setModalDel(null)}>Annuler</button>
+              <button style={{ ...s.btnP,background:"#A32D2D",borderColor:"#A32D2D" }} onClick={deleteUser}>Supprimer</button>
             </div>
           </div>
         </div>
