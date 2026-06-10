@@ -237,7 +237,12 @@ export default function AdminPage() {
 
   return (
     <div style={s.wrap}>
+      const navigate = useNavigate();
+import { useNavigate } from "react-router-dom";
       <h1 style={s.title}>🛠️ Administration EPIA</h1>
+      <button style={s.btnSm} onClick={() => navigate("/admin/matieres-ib")}>
+  ⚙️ Configurer les matières IB
+</button>
       {banner && <div style={s.banner(banner.type)}>{banner.msg}</div>}
 
       <div style={s.tabs}>
